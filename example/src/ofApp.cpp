@@ -1,4 +1,7 @@
 #include "ofApp.h"
+#include "ofxClipPCL.h"
+#include "ofxClipPCLShapes.h"
+#include "shadergen/ofxClipPCLShaderGenerator.h"
 
 using namespace ofx::clippcl;
 using namespace std;
@@ -6,10 +9,10 @@ using namespace std;
 //--------------------------------------------------------------
 void ofApp::setup(){
 	mesh_ = ofMesh::sphere(100, 64);
-	auto clipper = make_shared<ofx::clippcl::ShapeGroupAny>();
-	clipper->addShape<Plane>(glm::vec3{1,0,0}, 0);
-	clipper->addShape<Plane>(glm::vec3{0,1,0}, 0);
-	shape_ = clipper;
+	auto clipper = make_shared<ofx::clippcl::ClipperGroupAll>();
+	clipper->addClipper<Plane>(glm::vec3{1,0,0}, 0);
+	clipper->addClipper<Plane>(glm::vec3{0,1,0}, 0);
+	clipper_ = clipper;
 }
 
 //--------------------------------------------------------------
@@ -22,7 +25,10 @@ void ofApp::draw(){
 	ofPushMatrix();
 	ofTranslate(ofGetWindowSize()/2.f);
 	if(ofGetMousePressed()) {
-		shape_->getValid(mesh_).drawVertices();
+		shader_.begin();
+		mesh_.drawVertices();
+		shader_.end();
+		//		clipper_->getValid(mesh_).drawVertices();
 	}
 	else {
 		mesh_.drawVertices();
@@ -52,7 +58,7 @@ void ofApp::mouseDragged(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
-
+	shader_ = shader::Generator(clipper_.get()).createShader();
 }
 
 //--------------------------------------------------------------

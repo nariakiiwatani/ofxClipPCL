@@ -1,8 +1,10 @@
 #pragma once
 
 #include "ofMain.h"
-#include "ofxClipPCLShapes.h"
 
+namespace ofx { namespace clippcl {
+class Clipper;
+}}
 class ofApp : public ofBaseApp{
 	
 public:
@@ -23,5 +25,6 @@ public:
 	void gotMessage(ofMessage msg);
 private:
 	ofMesh mesh_;
-	std::shared_ptr<ofx::clippcl::Shape> shape_;
+	ofShader shader_;
+	std::shared_ptr<ofx::clippcl::Clipper> clipper_;
 };

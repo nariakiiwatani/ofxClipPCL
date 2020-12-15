@@ -1,27 +1,22 @@
 #include "ofxClipPCLShapes.h"
+#include <glm/gtx/string_cast.hpp>
 
 using namespace ofx::clippcl;
 using namespace std;
 
-ofMesh Shape::getValid(const ofMesh &src) const
+std::string Plane::getShaderCodeFuncName() const
 {
-	vector<ofIndexType> use;
-	auto &verts = src.getVertices();
-	use.reserve(verts.size());
-	for(ofIndexType i = 0; i < verts.size(); ++i) {
-		if(isValid(verts[i])) use.push_back(i);
-	}
-	ofMesh ret;
-	ret.getVertices().resize(use.size());
-	if(src.hasColors()) ret.getColors().resize(use.size());
-	if(src.hasNormals()) ret.getNormals().resize(use.size());
-	if(src.hasTexCoords()) ret.getTexCoords().resize(use.size());
-
-	for(ofIndexType i = 0; i < use.size(); ++i) {
-		ret.setVertex(i, src.getVertex(use[i]));
-		if(src.hasColors()) ret.setColor(i, src.getColor(use[i]));
-		if(src.hasNormals()) ret.setNormal(i, src.getNormal(use[i]));
-		if(src.hasTexCoords()) ret.setTexCoord(i, src.getTexCoord(use[i]));
-	}
-	return ret;
+	return "ofxClipPCLFuncPlane";
+}
+std::vector<std::string> Plane::getArgsForShaderFuncDeclare(const std::string &src_arg) const
+{
+	return {src_arg, "vec3 normal", "float distance"};
+}
+std::string Plane::getShaderCodeFuncImpl(const std::string &default_src_arg) const
+{
+	return "return dot(" + default_src_arg + ", normal) > distance;";
+}
+std::vector<std::string> Plane::getArgsForShaderFunc(const std::string &src_arg) const
+{
+	return {src_arg, glm::to_string(normal_), ofToString(distance_)};
 }
