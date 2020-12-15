@@ -35,7 +35,7 @@ public:
 		clippers_.push_back(clipper);
 		return clipper;
 	}
-	std::vector<std::shared_ptr<Clipper>> getClippers() { return clippers_; }
+	std::vector<std::shared_ptr<Clipper>> getClippers() const { return clippers_; }
 protected:
 	std::vector<std::shared_ptr<Clipper>> clippers_;
 };

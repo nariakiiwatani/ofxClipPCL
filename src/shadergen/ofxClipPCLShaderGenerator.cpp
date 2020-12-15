@@ -42,7 +42,7 @@ std::string Generator::createFuncs() const
 
 std::string Generator::createCall() const
 {
-	return makeFuncCall(clipper_->getShaderCodeFuncName(), clipper_->getArgsForShaderFunc("position"));
+	return makeFuncCall(clipper_.getShaderCodeFuncName(), clipper_.getArgsForShaderFunc("position"));
 }
 
 std::string Generator::createMain() const
@@ -67,20 +67,20 @@ std::string Generator::createMain() const
 }
 
 
-std::map<std::string, std::string> Generator::createFunc(::ofx::clippcl::Clipper *src, bool check_if_group) const
+std::map<std::string, std::string> Generator::createFunc(const ::ofx::clippcl::Clipper &src, bool check_if_group) const
 {
 	if(check_if_group) {
-		if(auto group = dynamic_cast<::ofx::clippcl::ClipperGroup*>(src)) {
-			return createFunc(group);
+		if(auto group = dynamic_cast<const ::ofx::clippcl::ClipperGroup*>(&src)) {
+			return createFunc(*group);
 		}
 	}
-	return {{src->getShaderCodeFuncName(), makeFuncSignature("bool", src->getShaderCodeFuncName(), src->getArgsForShaderFuncDeclare("vec3 point")) + "{" + src->getShaderCodeFuncImpl("point") + "}"}};
+	return {{src.getShaderCodeFuncName(), makeFuncSignature("bool", src.getShaderCodeFuncName(), src.getArgsForShaderFuncDeclare("vec3 point")) + "{" + src.getShaderCodeFuncImpl("point") + "}"}};
 }
-std::map<std::string, std::string> Generator::createFunc(::ofx::clippcl::ClipperGroup *src) const
+std::map<std::string, std::string> Generator::createFunc(const ::ofx::clippcl::ClipperGroup &src) const
 {
 	std::map<std::string, std::string> ret = createFunc(src, false);
-	for(auto &&clipper : src->getClippers()) {
-		auto funcs = createFunc(clipper.get());
+	for(auto &&clipper : src.getClippers()) {
+		auto funcs = createFunc(*clipper);
 		ret.insert(begin(funcs), end(funcs));
 	}
 	return ret;

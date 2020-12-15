@@ -36,7 +36,7 @@ std::vector<std::string> ClipperGroup::getArgsForShaderFunc(const std::string &s
 	std::vector<std::string> funcs;
 	funcs.reserve(clippers_.size());
 	for(auto &&clipper : clippers_) {
-		funcs.push_back(shader::Generator(clipper.get()).createCall());
+		funcs.push_back(shader::Generator(*clipper).createCall());
 	}
 	return {"bool["+ofToString(clippers_.size())+"]("
 		+ ofJoinString(funcs, ",") + 

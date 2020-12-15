@@ -12,6 +12,7 @@ void ofApp::setup(){
 	auto clipper = make_shared<ofx::clippcl::ClipperGroupAll>();
 	clipper->addClipper<Plane>(glm::vec3{1,0,0}, 0);
 	clipper->addClipper<Plane>(glm::vec3{0,1,0}, 0);
+	std::cout << shader::Generator(*clipper).createMain() << std::endl;
 	clipper_ = clipper;
 }
 
@@ -58,7 +59,7 @@ void ofApp::mouseDragged(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
-	shader_ = shader::Generator(clipper_.get()).createShader();
+	shader_ = shader::Generator(*clipper_).createShader();
 }
 
 //--------------------------------------------------------------
