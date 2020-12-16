@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ofxCLipPCL.h"
+#include "ofxClipPCL.h"
 
 namespace ofx { namespace clippcl {
 
