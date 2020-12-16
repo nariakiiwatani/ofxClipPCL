@@ -4,14 +4,6 @@
 using namespace ofx::clippcl;
 using namespace ofx::clippcl::shader;
 
-namespace {
-std::string makeFuncSignature(std::string ret_type, std::string func_name, std::vector<std::string> args) {
-	return ret_type + " " + func_name + "("+ofJoinString(args,",")+")";
-}
-std::string makeFuncCall(std::string func_name, std::vector<std::string> args) {
-	return func_name + "(" + ofJoinString(args, ",") + ")";
-}
-}
 void Generator::attachToShader(ofShader &dst, const std::string &clipping_func_name) const
 {
 	GLuint shader = glCreateShader(GL_VERTEX_SHADER);
@@ -34,18 +26,13 @@ std::string Generator::createFuncs() const
 	return ret;
 }
 
-std::string Generator::createCall() const
-{
-	return makeFuncCall(clipper_.getShaderCodeFuncName(), clipper_.getArgsForShaderFunc("position"));
-}
-
 std::string Generator::createMain(const std::string &func_name) const
 {
 	return R"(#version 410
 	)" + createFuncs() + R"(
 	
 	bool )" + func_name + R"((vec3 position) {
-		return )" + createCall() + R"(;
+	return )" + clipper_.getShaderCodeFuncCall("position") + R"(;
 	})";
 }
 
@@ -57,7 +44,7 @@ std::map<std::string, std::string> Generator::createFunc(const ::ofx::clippcl::C
 			return createFunc(*group);
 		}
 	}
-	return {{src.getShaderCodeFuncName(), makeFuncSignature("bool", src.getShaderCodeFuncName(), src.getArgsForShaderFuncDeclare("vec3 point")) + "{" + src.getShaderCodeFuncImpl("point") + "}"}};
+	return {{src.getShaderCodeFuncName(), src.getShaderCodeFunc("vec3", "position")}};
 }
 std::map<std::string, std::string> Generator::createFunc(const ::ofx::clippcl::ClipperGroup &src) const
 {

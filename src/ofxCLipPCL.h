@@ -14,6 +14,9 @@ public:
 
 	// clipping by GPU(vertex shader program)
 	virtual std::string getShaderCodeFuncName() const { return "ofxClipPCLFuncShape"; }
+	virtual std::string getShaderCodeFunc(const std::string &default_arg_type, const std::string &default_arg_name) const;
+	virtual std::string getShaderCodeFuncCall(const std::string &default_src_arg) const;
+protected:
 	virtual std::vector<std::string> getArgsForShaderFuncDeclare(const std::string &src_arg) const {
 		return {src_arg};
 	}

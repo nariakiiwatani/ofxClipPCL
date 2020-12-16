@@ -27,6 +27,15 @@ ofMesh Clipper::getValid(const ofMesh &src) const
 	return ret;
 }
 
+std::string Clipper::getShaderCodeFunc(const std::string &default_arg_type, const std::string &default_arg_name) const
+{
+	return "bool " + getShaderCodeFuncName() + "(" + ofJoinString(getArgsForShaderFuncDeclare(default_arg_type+" "+default_arg_name), ", ") + ") {" + getShaderCodeFuncImpl(default_arg_name) + "}";
+}
+std::string Clipper::getShaderCodeFuncCall(const std::string &default_src_arg) const
+{
+	return getShaderCodeFuncName() + "(" + ofJoinString(getArgsForShaderFunc(default_src_arg), ",") + ")";
+}
+
 std::vector<std::string> ClipperGroup::getArgsForShaderFuncDeclare(const std::string &src_arg) const
 {
 	return {"bool["+ofToString(clippers_.size())+"] results"};
@@ -36,7 +45,7 @@ std::vector<std::string> ClipperGroup::getArgsForShaderFunc(const std::string &s
 	std::vector<std::string> funcs;
 	funcs.reserve(clippers_.size());
 	for(auto &&clipper : clippers_) {
-		funcs.push_back(shader::Generator(*clipper).createCall());
+		funcs.push_back(clipper->getShaderCodeFuncCall(src_arg));
 	}
 	return {"bool["+ofToString(clippers_.size())+"]("
 		+ ofJoinString(funcs, ",") + 
