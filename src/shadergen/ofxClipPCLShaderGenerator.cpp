@@ -11,11 +11,38 @@ std::string makeFuncSignature(std::string ret_type, std::string func_name, std::
 std::string makeFuncCall(std::string func_name, std::vector<std::string> args) {
 	return func_name + "(" + ofJoinString(args, ",") + ")";
 }
+void attachShader(ofShader &dst, const std::string &source, GLuint type) {
+	GLuint shader = glCreateShader(type);
+	const char* sptr = source.c_str();
+	int ssize = source.size();
+	glShaderSource(shader, 1, &sptr, &ssize);
+	glCompileShader(shader);
+	glAttachShader(dst.getProgram(), shader);
+	glDeleteShader(shader);
+}
 }
 ofShader Generator::createShader() const
 {
 	ofShader ret;
-	ret.setupShaderFromSource(GL_VERTEX_SHADER, createMain());
+
+	ret.setupShaderFromSource(GL_VERTEX_SHADER, R"(
+	#version 410
+
+	layout (location = 0) in vec3 position;
+
+	uniform mat4 modelViewProjectionMatrix;
+
+	flat out int valid;
+
+	bool ofxClipPCLMainFunc(vec3 position);
+							  
+	void main()
+	{
+		valid = int(ofxClipPCLMainFunc(position));
+		gl_Position = modelViewProjectionMatrix * vec4(position, 1.0);
+	}
+	)");
+	
 	ret.setupShaderFromSource(GL_FRAGMENT_SHADER, R"(
 	#version 410
 
@@ -26,6 +53,8 @@ ofShader Generator::createShader() const
 		fragColor = vec4(1.0, float(valid), 0.0, 1.0);
 	}
 	)");
+	
+	attachShader(ret, createMain(), GL_VERTEX_SHADER);
 	ret.linkProgram();
 	return ret;
 }
@@ -47,23 +76,12 @@ std::string Generator::createCall() const
 
 std::string Generator::createMain() const
 {
-	return R"(
-	#version 410
-
-	layout (location = 0) in vec3 position;
-
-	uniform mat4 modelViewProjectionMatrix;
-
-	flat out int valid;
-	
+	return R"(#version 410
 	)" + createFuncs() + R"(
 	
-	void main()
-	{
-		valid = int()" + createCall() + R"();
-		gl_Position = modelViewProjectionMatrix * vec4(position, 1.0);
-	}
-	)";
+	bool ofxClipPCLMainFunc(vec3 position) {
+		return )" + createCall() + R"(;
+	})";
 }
 
 
