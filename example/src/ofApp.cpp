@@ -59,7 +59,36 @@ void ofApp::mouseDragged(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
-	shader_ = shader::Generator(*clipper_).createShader();
+	shader_.setupShaderFromSource(GL_VERTEX_SHADER, R"(
+	#version 410
+
+	layout (location = 0) in vec3 position;
+
+	uniform mat4 modelViewProjectionMatrix;
+
+	flat out int valid;
+
+	bool ofxClipPCLMainFunc(vec3 position);
+							  
+	void main()
+	{
+		valid = int(ofxClipPCLMainFunc(position));
+		gl_Position = modelViewProjectionMatrix * vec4(position, 1.0);
+	}
+	)");
+	
+	shader_.setupShaderFromSource(GL_FRAGMENT_SHADER, R"(
+	#version 410
+
+	flat in int valid;
+	out vec4 fragColor;
+
+	void main() {
+		fragColor = vec4(1.0, float(valid), 0.0, 1.0);
+	}
+	)");
+	shader::Generator(*clipper_).attachToShader(shader_);
+	shader_.linkProgram();
 }
 
 //--------------------------------------------------------------

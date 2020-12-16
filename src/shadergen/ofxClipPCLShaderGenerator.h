@@ -8,10 +8,10 @@ class Generator
 {
 public:
 	Generator(::ofx::clippcl::Clipper &src):clipper_(src){}
-	ofShader createShader() const;
+	void attachToShader(ofShader &shader, const std::string &clipping_func_name="ofxClipPCLMainFunc") const;
 	std::string createFuncs() const;
 	std::string createCall() const;
-	std::string createMain() const;
+	std::string createMain(const std::string &funcname="ofxClipPCLMainFunc") const;
 private:
 	::ofx::clippcl::Clipper &clipper_;
 
