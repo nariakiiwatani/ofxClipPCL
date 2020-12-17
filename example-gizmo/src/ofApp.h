@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
-#include "ofxClipPCLShapes.h"
+#include "ofxClipPCLGeometry.h"
 #include "ofxImGui.h"
 #include "ofxImGuizmo.h"
 

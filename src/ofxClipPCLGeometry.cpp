@@ -1,4 +1,4 @@
-#include "ofxClipPCLShapes.h"
+#include "ofxClipPCLGeometry.h"
 #include <glm/gtx/matrix_decompose.hpp>
 #include <glm/gtx/string_cast.hpp>
 
