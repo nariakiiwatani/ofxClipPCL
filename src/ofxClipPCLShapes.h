@@ -1,26 +1,40 @@
 #pragma once
 
 #include "ofxClipPCL.h"
+#include "ofNode.h"
 
 namespace ofx { namespace clippcl {
 
-class Plane : public Clipper
+class Geometry : public Clipper
 {
 public:
-	Plane(const glm::vec3 &normal, float distance)
-	:normal_(glm::normalize(normal))
-	,distance_(distance)
-	{}
-	bool isValid(const glm::vec3 &point) const override {
-		return glm::dot(point, normal_) > distance_;
+	glm::mat4 getWorldMatrix() const;
+	void setWorldMatrix(const glm::mat4 &mat);
+protected:
+	ofNode node_;
+	virtual void applyMatrix(const glm::mat4 &mat) {}
+	void refreshMatrix(const glm::mat4 &mat);
+};
+
+class Plane : public Geometry
+{
+public:
+	Plane(const glm::vec4 &args)
+	:args_(args) {
+		refreshMatrix(buildMatrix());
 	}
+	Plane(const glm::vec3 &normal, float distance)
+	:Plane(glm::vec4(normal,distance))
+	{}
+	bool isValid(const glm::vec3 &point) const override;
 
 	std::string getShaderCodeFuncName() const override;
 	std::vector<std::string> getArgsForShaderFuncDeclare(const std::string &src_arg) const override;
 	std::string getShaderCodeFuncImpl(const std::string &default_src_arg) const override;
 	std::vector<std::string> getArgsForShaderFunc(const std::string &src_arg) const override;
 private:
-	glm::vec3 normal_ = glm::vec3(0,1,0);
-	float distance_ = 0;
+	void applyMatrix(const glm::mat4 &mat) override;
+	glm::mat4 buildMatrix() const;
+	glm::vec4 args_ = glm::vec4(0,1,0,0);
 };
 }}
