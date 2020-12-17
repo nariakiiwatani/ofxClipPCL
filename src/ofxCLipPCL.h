@@ -27,6 +27,18 @@ protected:
 		return {src_arg};
 	}
 };
+template<typename T>
+class Not : public T
+{
+public:
+	using T::T;
+	bool isValid(const glm::vec3 &point) const override {
+		return !T::isValid(point);
+	}
+	std::string getShaderCodeFuncCall(const std::string &default_src_arg) const override {
+		return "!("+T::getShaderCodeFuncCall(default_src_arg)+")";
+	}
+};
 class ClipperGroup : public Clipper
 {
 public:

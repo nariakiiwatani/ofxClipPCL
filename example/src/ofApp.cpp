@@ -1,6 +1,6 @@
 #include "ofApp.h"
 #include "ofxClipPCL.h"
-#include "ofxClipPCLShapes.h"
+#include "ofxClipPCLGeometry.h"
 #include "shadergen/ofxClipPCLShaderGenerator.h"
 
 using namespace ofx::clippcl;
@@ -9,7 +9,7 @@ using namespace std;
 //--------------------------------------------------------------
 void ofApp::setup(){
 	mesh_ = ofMesh::sphere(100, 64);
-	auto clipper = make_shared<ofx::clippcl::ClipperGroupAll>();
+	auto clipper = make_shared<Not<ClipperGroupAll>>();
 	clipper->addClipper<Plane>(glm::vec3{1,0,0}, 0);
 	clipper->addClipper<Plane>(glm::vec3{0,1,0}, 0);
 	std::cout << shader::Generator(*clipper).createMain() << std::endl;
