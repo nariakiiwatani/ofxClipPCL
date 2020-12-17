@@ -11,6 +11,7 @@ public:
 	glm::mat4 getWorldMatrix() const;
 	void setWorldMatrix(const glm::mat4 &mat);
 	virtual void draw() const {}
+	ofNode& getNode() { return node_; }
 protected:
 	ofNode node_;
 	virtual void applyMatrix(const glm::mat4 &mat) {}
