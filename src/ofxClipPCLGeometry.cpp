@@ -1,6 +1,7 @@
 #include "ofxClipPCLGeometry.h"
 #include <glm/gtx/matrix_decompose.hpp>
 #include <glm/gtx/string_cast.hpp>
+#include "of3dGraphics.h"
 
 using namespace ofx::clippcl;
 using namespace std;
@@ -67,4 +68,10 @@ std::vector<std::string> Plane::getArgsForShaderFunc(const std::string &src_arg)
 }
 bool Plane::isValid(const glm::vec3 &point) const {
 	return glm::dot(point, glm::vec3(args_)) > -args_[3];
+}
+void Plane::draw() const
+{
+	node_.transformGL();
+	ofDrawPlane(0,0,0,1,1);
+	node_.restoreTransformGL();
 }

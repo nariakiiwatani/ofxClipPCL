@@ -10,6 +10,7 @@ class Geometry : public Clipper
 public:
 	glm::mat4 getWorldMatrix() const;
 	void setWorldMatrix(const glm::mat4 &mat);
+	virtual void draw() const {}
 protected:
 	ofNode node_;
 	virtual void applyMatrix(const glm::mat4 &mat) {}
@@ -26,6 +27,7 @@ public:
 	Plane(const glm::vec3 &normal, float distance)
 	:Plane(glm::vec4(normal,distance))
 	{}
+	void draw() const override;
 	bool isValid(const glm::vec3 &point) const override;
 
 	std::string getShaderCodeFuncName() const override;

@@ -21,6 +21,10 @@ void ofApp::update(){
 void ofApp::draw(){
 	camera_.begin();
 	geom_->getValid(mesh_).drawVertices();
+	ofPushStyle();
+	ofSetColor(ofColor::red, 100);
+	geom_->draw();
+	ofPopStyle();
 	camera_.end();
 	gui_.begin();
 	ImGuizmo::BeginFrame();
