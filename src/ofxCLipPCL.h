@@ -45,7 +45,7 @@ public:
 	std::vector<std::string> getArgsForShaderFuncDeclare(const std::string &src_arg) const override;
 	std::vector<std::string> getArgsForShaderFunc(const std::string &src_arg) const override;
 	template<typename T, typename ...Args>
-	std::shared_ptr<T> addClipper(Args &&...args) {
+	std::shared_ptr<T> add(Args &&...args) {
 		auto clipper = std::make_shared<T>(std::forward<Args>(args)...);
 		clippers_.push_back(clipper);
 		return clipper;
