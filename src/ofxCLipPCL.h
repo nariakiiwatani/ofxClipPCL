@@ -8,7 +8,7 @@ class Clipper
 {
 public:
 	// for clipping by CPU
-	virtual bool isValid(const glm::vec3 &point) const=0;
+	virtual bool isValid(const glm::vec3 &point) const { return true; }
 	ofMesh getValid(const ofMesh &src) const;
 	void reduce(ofMesh &srcdst) const { reduce(srcdst, srcdst); }
 	void reduce(const ofMesh &src, ofMesh &dst) const { dst = getValid(src); }
@@ -20,8 +20,12 @@ public:
 	
 	// for serialize/deserialize
 	virtual ofJson toJson() const {
-		return {{"type","clipper"}};
+		return {{"type", getTypeForSerialize()}};
 	}
+	virtual void loadJson(const ofJson &json) {
+		typeAssert(json["type"]);
+	}
+	virtual std::string getTypeForSerialize() const { return "clipper"; }
 
 protected:
 	virtual std::vector<std::string> getArgsForShaderFuncDeclare(const std::string &src_arg) const {
@@ -32,6 +36,9 @@ protected:
 	}
 	virtual std::vector<std::string> getArgsForShaderFunc(const std::string &src_arg) const {
 		return {src_arg};
+	}
+	bool typeAssert(const std::string &type) const {
+		return type == getTypeForSerialize();
 	}
 };
 template<typename T>
@@ -69,6 +76,8 @@ public:
 	bool isValid(const glm::vec3 &point) const override;
 	
 	virtual ofJson toJson() const override;
+	virtual void loadJson(const ofJson &json) override;
+	virtual std::string getTypeForSerialize() const override { return "clipperGroupAll"; }
 };
 class ClipperGroupAny : public ClipperGroup
 {

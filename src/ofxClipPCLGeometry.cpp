@@ -37,6 +37,19 @@ void Geometry::refreshMatrix(const glm::mat4 &mat) {
 	node_.setScale(scale);
 }
 
+ofJson Geometry::toJson() const
+{
+	return {
+		{"type", getTypeForSerialize()},
+		{"matrix", ofxJsonUtils::convert(getWorldMatrix())}
+	};
+}
+void Geometry::loadJson(const ofJson &json)
+{
+	typeAssert(json["type"]);
+	setWorldMatrix(json["matrix"]);
+}
+
 
 void Plane::applyMatrix(const glm::mat4 &mat)
 {
