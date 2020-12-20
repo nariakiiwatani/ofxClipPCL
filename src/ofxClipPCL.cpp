@@ -1,5 +1,6 @@
 #include "ofxClipPCL.h"
 #include "ofxClipPCLShaderGenerator.h"
+#include "ofxJsonUtils.h"
 
 using namespace ofx::clippcl;
 using namespace std;
@@ -71,6 +72,19 @@ bool ClipperGroupAll::isValid(const glm::vec3 &point) const
 	return all_of(begin(clippers_), end(clippers_), [point](shared_ptr<Clipper> clipper) {
 		return clipper->isValid(point);
 	});
+}
+
+ofJson ClipperGroupAll::toJson() const {
+	auto children = getClippers();
+	return {
+		{"type","clipperGroupAll"},
+		{
+			"children", accumulate(begin(children), end(children), ofJson(), [](ofJson sum, shared_ptr<Clipper> clipper) {
+				sum.push_back(clipper->toJson());
+				return sum;
+			})
+		}
+	};
 }
 
 std::string ClipperGroupAny::getShaderCodeFuncName() const

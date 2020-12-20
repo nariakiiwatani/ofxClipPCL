@@ -35,6 +35,8 @@ public:
 	std::vector<std::string> getArgsForShaderFuncDeclare(const std::string &src_arg) const override;
 	std::string getShaderCodeFuncImpl(const std::string &default_src_arg) const override;
 	std::vector<std::string> getArgsForShaderFunc(const std::string &src_arg) const override;
+	
+	virtual ofJson toJson() const override;
 private:
 	void applyMatrix(const glm::mat4 &mat) override;
 	glm::mat4 buildMatrix() const;

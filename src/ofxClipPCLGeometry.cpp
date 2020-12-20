@@ -2,6 +2,7 @@
 #include <glm/gtx/matrix_decompose.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include "of3dGraphics.h"
+#include "ofxJsonUtils.h"
 
 using namespace ofx::clippcl;
 using namespace std;
@@ -74,4 +75,12 @@ void Plane::draw() const
 	node_.transformGL();
 	ofDrawPlane(0,0,0,1,1);
 	node_.restoreTransformGL();
+}
+
+ofJson Plane::toJson() const
+{
+	return {
+		{"type", "plane"},
+		{"matrix", ofxJsonUtils::convert(node_.getGlobalTransformMatrix())}
+	};
 }
