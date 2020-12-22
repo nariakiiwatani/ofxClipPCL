@@ -12,10 +12,6 @@ public:
 	void setWorldMatrix(const glm::mat4 &mat);
 	virtual void draw() const {}
 	ofNode& getNode() { return node_; }
-	virtual ofJson toJson() const override;
-	virtual void loadJson(const ofJson &json) override;
-	virtual std::string getTypeForSerialize() const override { return "geometry"; }
-
 protected:
 	ofNode node_;
 	virtual void applyMatrix(const glm::mat4 &mat) {}
@@ -40,9 +36,6 @@ public:
 	std::vector<std::string> getArgsForShaderFuncDeclare(const std::string &src_arg) const override;
 	std::string getShaderCodeFuncImpl(const std::string &default_src_arg) const override;
 	std::vector<std::string> getArgsForShaderFunc(const std::string &src_arg) const override;
-	
-	virtual ofJson toJson() const override;
-	virtual std::string getTypeForSerialize() const override { return "plane"; }
 private:
 	void applyMatrix(const glm::mat4 &mat) override;
 	glm::mat4 buildMatrix() const;

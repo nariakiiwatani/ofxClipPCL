@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ofMesh.h"
-#include "ofJson.h"
 
 namespace ofx { namespace clippcl {
 class Clipper
@@ -18,15 +17,6 @@ public:
 	virtual std::string getShaderCodeFunc(const std::string &default_arg_type, const std::string &default_arg_name) const;
 	virtual std::string getShaderCodeFuncCall(const std::string &default_src_arg) const;
 	
-	// for serialize/deserialize
-	virtual ofJson toJson() const {
-		return {{"type", getTypeForSerialize()}};
-	}
-	virtual void loadJson(const ofJson &json) {
-		typeAssert(json["type"]);
-	}
-	virtual std::string getTypeForSerialize() const { return "clipper"; }
-
 protected:
 	virtual std::vector<std::string> getArgsForShaderFuncDeclare(const std::string &src_arg) const {
 		return {src_arg};
@@ -74,10 +64,6 @@ public:
 	std::string getShaderCodeFuncName() const override;
 	std::string getShaderCodeFuncImpl(const std::string &default_src_arg) const override;
 	bool isValid(const glm::vec3 &point) const override;
-	
-	virtual ofJson toJson() const override;
-	virtual void loadJson(const ofJson &json) override;
-	virtual std::string getTypeForSerialize() const override { return "clipperGroupAll"; }
 };
 class ClipperGroupAny : public ClipperGroup
 {
