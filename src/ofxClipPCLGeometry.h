@@ -8,6 +8,8 @@ namespace ofx { namespace clippcl {
 class Geometry : public Clipper
 {
 public:
+	OFX_CLIPPCL_ACCEPTOR_FUNCTIONS
+	
 	glm::mat4 getWorldMatrix() const;
 	void setWorldMatrix(const glm::mat4 &mat);
 	virtual void draw() const {}
@@ -21,6 +23,8 @@ protected:
 class Plane : public Geometry
 {
 public:
+	OFX_CLIPPCL_ACCEPTOR_FUNCTIONS
+	
 	Plane() = default;
 	Plane(const glm::vec4 &args)
 	:args_(args) {
