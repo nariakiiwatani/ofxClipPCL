@@ -13,7 +13,7 @@ public:
 	void reduce(const ofMesh &src, ofMesh &dst) const { dst = getValid(src); }
 
 	// clipping by GPU(vertex shader program)
-	virtual std::string getShaderCodeFuncName() const { return "ofxClipPCLFuncShape"; }
+	virtual std::string getShaderCodeFuncName() const { return "ofxClipPCLFuncClipper"; }
 	virtual std::string getShaderCodeFunc(const std::string &default_arg_type, const std::string &default_arg_name) const;
 	virtual std::string getShaderCodeFuncCall(const std::string &default_src_arg) const;
 	
@@ -54,6 +54,8 @@ public:
 		clippers_.push_back(clipper);
 		return clipper;
 	}
+	void add(std::shared_ptr<Clipper> clipper) { clippers_.push_back(clipper); }
+	void clear() { clippers_.clear(); }
 	std::vector<std::shared_ptr<Clipper>> getClippers() const { return clippers_; }
 protected:
 	std::vector<std::shared_ptr<Clipper>> clippers_;
