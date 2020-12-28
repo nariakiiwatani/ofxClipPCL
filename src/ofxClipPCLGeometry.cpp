@@ -20,7 +20,7 @@ void Geometry::setWorldMatrix(const glm::mat4 &mat) {
 	node_.setGlobalPosition(translation);
 	node_.setGlobalOrientation(rotation);
 	node_.setScale(scale/(node_.getParent()?node_.getParent()->getGlobalScale():glm::vec3{1,1,1}));
-	applyMatrix(node_.getLocalTransformMatrix());
+	applyMatrix(node_.getGlobalTransformMatrix());
 }
 
 void Geometry::refreshMatrix(const glm::mat4 &mat) {
