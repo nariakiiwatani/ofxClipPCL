@@ -17,5 +17,6 @@ IMPL_VISIT_FUNCS_SUB(ClipperGroupAll, ClipperGroup)
 IMPL_VISIT_FUNCS_SUB(ClipperGroupAny, ClipperGroup)
 IMPL_VISIT_FUNCS_SUB(Geometry, Clipper)
 IMPL_VISIT_FUNCS_SUB(Plane, Geometry)
+IMPL_VISIT_FUNCS_SUB(Box, Geometry)
 #undef IMPL_VISIT_FUNCS_SUB
 
