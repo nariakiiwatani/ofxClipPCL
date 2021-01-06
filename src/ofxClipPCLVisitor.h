@@ -4,7 +4,14 @@
 virtual inline void accept(Visitor &v) { \
 	v.visit(*this); \
 } \
-virtual inline void accept(Visitor &v) const{ \
+virtual inline void accept(Visitor &v) const { \
+	v.visit(*this); \
+}
+#define OFX_CLIPPCL_ACCEPTOR_FUNCTIONS_OVERRIDE \
+virtual inline void accept(Visitor &v) override { \
+	v.visit(*this); \
+} \
+virtual inline void accept(Visitor &v) const override { \
 	v.visit(*this); \
 }
 
