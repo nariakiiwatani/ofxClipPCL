@@ -2,51 +2,35 @@
 #include <glm/gtx/matrix_decompose.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include "of3dGraphics.h"
+#include "ofGraphics.h"
+#include "ofNode.h"
 
 using namespace ofx::clippcl;
 using namespace std;
 
-glm::mat4 Geometry::getWorldMatrix() const {
-	return node_.getGlobalTransformMatrix();
-}
-void Geometry::setWorldMatrix(const glm::mat4 &mat) {
-	glm::vec3 scale;
-	glm::quat rotation;
-	glm::vec3 translation;
-	glm::vec3 skew;
-	glm::vec4 perspective;
-	glm::decompose(mat, scale, rotation, translation, skew, perspective);
-	
-	node_.setGlobalPosition(translation);
-	node_.setGlobalOrientation(rotation);
-	node_.setScale(scale/(node_.getParent()?node_.getParent()->getGlobalScale():glm::vec3{1,1,1}));
-	applyMatrix(node_.getGlobalTransformMatrix());
-}
-
-void Geometry::refreshMatrix(const glm::mat4 &mat) {
-	glm::vec3 scale;
-	glm::quat rotation;
-	glm::vec3 translation;
-	glm::vec3 skew;
-	glm::vec4 perspective;
-	glm::decompose(mat, scale, rotation, translation, skew, perspective);
-	
-	node_.setPosition(translation);
-	node_.setOrientation(rotation);
-	node_.setScale(scale);
-}
-
-void Plane::applyMatrix(const glm::mat4 &mat)
-{
-	args_ = glm::inverse(glm::transpose(mat))*glm::vec4{0,0,1,0};
-}
-
-glm::mat4 Plane::buildMatrix() const
+glm::mat4 Plane::buildMatrix(const glm::vec4 &args, const glm::vec3 &scale) const
 {
 	ofNode node;
-	node.lookAt(-glm::vec3(args_));
-	node.dolly(-args_[3]);
+	node.lookAt(-glm::vec3(args));
+	node.dolly(-args[3]);
+	node.setScale(scale);
 	return node.getLocalTransformMatrix();
+}
+
+void Plane::setMatrix(const glm::mat4 &mat)
+{
+	mat_ = mat;
+	glm::vec4 args = glm::inverse(glm::transpose(mat))*glm::vec4{0,0,1,0};
+	normal_ = args;
+	distance_ = args[3];
+	scale_ = glm::vec3(glm::length(glm::vec3(mat[0])),
+					   glm::length(glm::vec3(mat[1])),
+					   glm::length(glm::vec3(mat[2])));
+}
+
+glm::mat4 Plane::getMatrix() const
+{
+	return mat_;
 }
 
 std::string Plane::getShaderCodeFuncName() const
@@ -63,29 +47,36 @@ std::string Plane::getShaderCodeFuncImpl(const std::string &default_src_arg) con
 }
 std::vector<std::string> Plane::getArgsForShaderFunc(const std::string &src_arg) const
 {
-	return {src_arg, glm::to_string(glm::vec3(args_)), ofToString(-args_[3])};
+	return {src_arg, glm::to_string(normal_), ofToString(-distance_)};
 }
 bool Plane::isValid(const glm::vec3 &point) const {
-	return glm::dot(point, glm::vec3(args_)) > -args_[3];
+	return glm::dot(point, normal_) > -distance_;
 }
 void Plane::draw() const
 {
-	node_.transformGL();
+	ofPushMatrix();
+	ofMultMatrix(mat_);
 	ofDrawPlane(0,0,0,1,1);
-	node_.restoreTransformGL();
+	ofPopMatrix();
 }
 
 
-void Box::applyMatrix(const glm::mat4 &mat)
+glm::mat4 Box::getMatrix() const
 {
+	return mat_;
+}
+void Box::setMatrix(const glm::mat4 &mat)
+{
+	mat_ = mat;
 	inv_mat_ = glm::inverse(mat);
 }
 
 void Box::draw() const
 {
-	node_.transformGL();
+	ofPushMatrix();
+	ofMultMatrix(mat_);
 	ofDrawBox(2);
-	node_.restoreTransformGL();
+	ofPopMatrix();
 }
 bool Box::isValid(const glm::vec3 &point) const
 {
