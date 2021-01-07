@@ -109,3 +109,52 @@ std::vector<std::string> Box::getArgsForShaderFunc(const std::string &src_arg) c
 			glm::to_string(inv_mat_[2]),
 			glm::to_string(inv_mat_[3])}, ",")+")"};
 }
+
+
+glm::mat4 Sphere::getMatrix() const
+{
+	return mat_;
+}
+void Sphere::setMatrix(const glm::mat4 &mat)
+{
+	mat_ = mat;
+	inv_mat_ = glm::inverse(mat);
+}
+
+void Sphere::draw() const
+{
+	ofPushMatrix();
+	ofMultMatrix(mat_);
+	ofDrawSphere(1);
+	ofPopMatrix();
+}
+bool Sphere::isValid(const glm::vec3 &point) const
+{
+	return glm::length2(glm::vec3(inv_mat_*glm::vec4(point, 1))) < 1;
+}
+
+std::string Sphere::getShaderCodeFuncName() const
+{
+	return "ofxClipPCLFuncSphere";
+}
+std::vector<std::string> Sphere::getArgsForShaderFuncDeclare(const std::string &src_arg) const
+{
+	return {src_arg, "mat4 inv_mat"};
+}
+std::string Sphere::getShaderCodeFuncImpl(const std::string &default_src_arg) const
+{
+	return R"(
+	vec3 p = (inv_mat*vec4()" + default_src_arg + R"(,1)).xyz;
+	return dot(p,p) < 1;
+	)";
+}
+std::vector<std::string> Sphere::getArgsForShaderFunc(const std::string &src_arg) const
+{
+	
+	return {src_arg, "mat4("+
+		ofJoinString({
+			glm::to_string(inv_mat_[0]),
+			glm::to_string(inv_mat_[1]),
+			glm::to_string(inv_mat_[2]),
+			glm::to_string(inv_mat_[3])}, ",")+")"};
+}

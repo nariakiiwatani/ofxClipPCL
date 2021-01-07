@@ -24,6 +24,7 @@ class ClipperGroupAny;
 class Geometry;
 class Plane;
 class Box;
+class Sphere;
 class Visitor
 {
 public:
@@ -37,6 +38,7 @@ public:
 	DECLARE_VISIT_FUNCS(Geometry)
 	DECLARE_VISIT_FUNCS(Plane)
 	DECLARE_VISIT_FUNCS(Box)
+	DECLARE_VISIT_FUNCS(Sphere)
 #undef DECLARE_VISIT_FUNCS
 };
 
