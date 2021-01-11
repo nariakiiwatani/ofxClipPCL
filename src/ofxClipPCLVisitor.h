@@ -4,14 +4,14 @@
 virtual inline void accept(Visitor &v) { \
 	v.visit(*this); \
 } \
-virtual inline void accept(Visitor &v) const { \
+virtual inline void accept(ConstVisitor &v) const { \
 	v.visit(*this); \
 }
 #define OFX_CLIPPCL_ACCEPTOR_FUNCTIONS_OVERRIDE \
 virtual inline void accept(Visitor &v) override { \
 	v.visit(*this); \
 } \
-virtual inline void accept(Visitor &v) const override { \
+virtual inline void accept(ConstVisitor &v) const override { \
 	v.visit(*this); \
 }
 
@@ -28,18 +28,26 @@ class Sphere;
 class Visitor
 {
 public:
-#define DECLARE_VISIT_FUNCS(Type) \
-	virtual void visit(Type&); \
-	virtual void visit(const Type&);
-	DECLARE_VISIT_FUNCS(Clipper)
-	DECLARE_VISIT_FUNCS(ClipperGroup)
-	DECLARE_VISIT_FUNCS(ClipperGroupAll)
-	DECLARE_VISIT_FUNCS(ClipperGroupAny)
-	DECLARE_VISIT_FUNCS(Geometry)
-	DECLARE_VISIT_FUNCS(Plane)
-	DECLARE_VISIT_FUNCS(Box)
-	DECLARE_VISIT_FUNCS(Sphere)
-#undef DECLARE_VISIT_FUNCS
+	virtual void visit(Clipper&);
+	virtual void visit(ClipperGroup&);
+	virtual void visit(ClipperGroupAll&);
+	virtual void visit(ClipperGroupAny&);
+	virtual void visit(Geometry&);
+	virtual void visit(Plane&);
+	virtual void visit(Box&);
+	virtual void visit(Sphere&);
+};
+class ConstVisitor
+{
+public:
+	virtual void visit(const Clipper&);
+	virtual void visit(const ClipperGroup&);
+	virtual void visit(const ClipperGroupAll&);
+	virtual void visit(const ClipperGroupAny&);
+	virtual void visit(const Geometry&);
+	virtual void visit(const Plane&);
+	virtual void visit(const Box&);
+	virtual void visit(const Sphere&);
 };
 
 }}
