@@ -39,10 +39,16 @@ std::string Clipper::getShaderCodeFuncCall(const std::string &default_src_arg) c
 
 std::vector<std::string> ClipperGroup::getArgsForShaderFuncDeclare(const std::string &src_arg) const
 {
+	if(clippers_.empty()) {
+		return {};
+	}
 	return {"bool["+ofToString(clippers_.size())+"] results"};
 }
 std::vector<std::string> ClipperGroup::getArgsForShaderFunc(const std::string &src_arg) const
 {
+	if(clippers_.empty()) {
+		return {};
+	}
 	std::vector<std::string> funcs;
 	funcs.reserve(clippers_.size());
 	for(auto &&clipper : clippers_) {
@@ -60,6 +66,9 @@ std::string ClipperGroupAll::getShaderCodeFuncName() const
 }
 std::string ClipperGroupAll::getShaderCodeFuncImpl(const std::string &default_src_arg) const
 {
+	if(clippers_.empty()) {
+		return "return true;";
+	}
 	return R"(
 	for(int ptr = 0; ptr < )" + ofToString(clippers_.size()) + R"(; ++ptr) {
 		if(!results[ptr]) return false;
@@ -80,6 +89,9 @@ std::string ClipperGroupAny::getShaderCodeFuncName() const
 }
 std::string ClipperGroupAny::getShaderCodeFuncImpl(const std::string &default_src_arg) const
 {
+	if(clippers_.empty()) {
+		return "return false;";
+	}
 	return R"(
 	for(int ptr = 0; ptr < )" + ofToString(clippers_.size()) + R"(; ++ptr) {
 		if(results[ptr]) return true;
