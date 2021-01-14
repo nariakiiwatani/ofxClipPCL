@@ -9,18 +9,8 @@ class Geometry : public Clipper
 public:
 	OFX_CLIPPCL_ACCEPTOR_FUNCTIONS_OVERRIDE
 	
-	Geometry()=default;
-	Geometry(const glm::mat4 &mat) {
-		setMatrix(mat);
-	}
-	Geometry(const glm::vec3 &translate, const glm::quat &rotate, const glm::vec3 &scale)
-	:Geometry(glm::translate(translate)
-			  *glm::mat4_cast(rotate)
-			  *glm::scale(scale)) {
-	}
-
-	virtual glm::mat4 getMatrix() const = 0;
 	virtual void setMatrix(const glm::mat4 &mat) {}
+	virtual glm::mat4 getMatrix() const = 0;
 	virtual void draw() const {}
 };
 
@@ -29,9 +19,9 @@ class Plane : public Geometry
 public:
 	OFX_CLIPPCL_ACCEPTOR_FUNCTIONS_OVERRIDE
 	
-	using Geometry::Geometry;
-	Plane(const glm::vec4 &args)
-	:Plane(buildMatrix(args)) {
+	Plane()=default;
+	Plane(const glm::vec4 &args) {
+		setMatrix(buildMatrix(args));
 	}
 	Plane(const glm::vec3 &normal, float distance)
 	:Plane(glm::vec4(normal, distance)) {
@@ -58,11 +48,20 @@ class Box : public Geometry
 {
 public:
 	OFX_CLIPPCL_ACCEPTOR_FUNCTIONS_OVERRIDE
-	
-	using Geometry::Geometry;
+
+	Box()=default;
+	Box(const glm::mat4 &mat) {
+		setMatrix(mat);
+	}
+	Box(const glm::vec3 &translate, const glm::quat &rotate, const glm::vec3 &scale)
+	:Box(glm::translate(translate)
+			  *glm::mat4_cast(rotate)
+			  *glm::scale(scale)) {
+	}
+
 	Box(const glm::vec3 &center, float width, float height, float depth)
-	:Box(center, glm::quat(), glm::vec3(width, height, depth))
-	{}
+	:Box(center, glm::quat(), glm::vec3(width, height, depth)) {
+	}
 
 	glm::mat4 getMatrix() const override;
 	void setMatrix(const glm::mat4 &mat) override;
@@ -82,7 +81,15 @@ class Sphere : public Geometry
 public:
 	OFX_CLIPPCL_ACCEPTOR_FUNCTIONS_OVERRIDE
 	
-	using Geometry::Geometry;
+	Sphere()=default;
+	Sphere(const glm::mat4 &mat) {
+		setMatrix(mat);
+	}
+	Sphere(const glm::vec3 &translate, const glm::quat &rotate, const glm::vec3 &scale)
+	:Sphere(glm::translate(translate)
+			  *glm::mat4_cast(rotate)
+			  *glm::scale(scale)) {
+	}
 	Sphere(const glm::vec3 &center, float radius)
 	:Sphere(center, glm::quat(), glm::vec3(radius))
 	{}
