@@ -106,4 +106,34 @@ public:
 private:
 	glm::mat4 mat_, inv_mat_;
 };
+class Cone : public Geometry
+{
+public:
+	OFX_CLIPPCL_ACCEPTOR_FUNCTIONS_OVERRIDE
+	
+	Cone()=default;
+	Cone(const glm::mat4 &mat) {
+		setMatrix(mat);
+	}
+	Cone(const glm::vec3 &center_of_footprint, const glm::quat &rotate, const glm::vec3 &scale)
+	:Cone(glm::translate(center_of_footprint)
+			*glm::mat4_cast(rotate)
+			*glm::scale(scale)) {
+	}
+	Cone(const glm::vec3 &center_of_footprint, float radius, float height)
+	:Cone(center_of_footprint, glm::quat(), glm::vec3(radius,height,radius))
+	{}
+	
+	glm::mat4 getMatrix() const override;
+	void setMatrix(const glm::mat4 &mat) override;
+	void draw() const override;
+	bool isValid(const glm::vec3 &point) const override;
+	
+	std::string getShaderCodeFuncName() const override;
+	std::vector<std::string> getArgsForShaderFuncDeclare(const std::string &src_arg) const override;
+	std::string getShaderCodeFuncImpl(const std::string &default_src_arg) const override;
+	std::vector<std::string> getArgsForShaderFunc(const std::string &src_arg) const override;
+private:
+	glm::mat4 mat_, inv_mat_;
+};
 }}

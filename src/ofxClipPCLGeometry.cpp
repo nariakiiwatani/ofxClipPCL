@@ -158,3 +158,54 @@ std::vector<std::string> Sphere::getArgsForShaderFunc(const std::string &src_arg
 			glm::to_string(inv_mat_[2]),
 			glm::to_string(inv_mat_[3])}, ",")+")"};
 }
+
+glm::mat4 Cone::getMatrix() const
+{
+	return mat_;
+}
+void Cone::setMatrix(const glm::mat4 &mat)
+{
+	mat_ = mat;
+	inv_mat_ = glm::inverse(mat);
+}
+
+void Cone::draw() const
+{
+	ofPushMatrix();
+	ofMultMatrix(mat_);
+	ofDrawCone(0,0.5f,0, 1,-1);
+	ofPopMatrix();
+}
+bool Cone::isValid(const glm::vec3 &point) const
+{
+	auto pos = glm::vec3(inv_mat_*glm::vec4(point, 1));
+	auto xz = glm::vec2(pos.x,pos.z);
+	auto y = pos.y;
+	return y > 0 && y < 1 && glm::length2(xz) < (1-y)*(1-y);
+}
+
+std::string Cone::getShaderCodeFuncName() const
+{
+	return "ofxClipPCLFuncCone";
+}
+std::vector<std::string> Cone::getArgsForShaderFuncDeclare(const std::string &src_arg) const
+{
+	return {src_arg, "mat4 inv_mat"};
+}
+std::string Cone::getShaderCodeFuncImpl(const std::string &default_src_arg) const
+{
+	return R"(
+	vec3 p = (inv_mat*vec4()" + default_src_arg + R"(,1)).xyz;
+	return p.y > 0 && p.y < 1 && dot(p.xz,p.xz) < (1-p.y)*(1-p.y);
+	)";
+}
+std::vector<std::string> Cone::getArgsForShaderFunc(const std::string &src_arg) const
+{
+	
+	return {src_arg, "mat4("+
+		ofJoinString({
+			glm::to_string(inv_mat_[0]),
+			glm::to_string(inv_mat_[1]),
+			glm::to_string(inv_mat_[2]),
+			glm::to_string(inv_mat_[3])}, ",")+")"};
+}

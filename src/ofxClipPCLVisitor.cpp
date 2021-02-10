@@ -18,6 +18,7 @@ IMPL_VISIT_FUNCS_SUB(Geometry, Clipper)
 IMPL_VISIT_FUNCS_SUB(Plane, Geometry)
 IMPL_VISIT_FUNCS_SUB(Box, Geometry)
 IMPL_VISIT_FUNCS_SUB(Sphere, Geometry)
+IMPL_VISIT_FUNCS_SUB(Cone, Geometry)
 #undef IMPL_VISIT_FUNCS_SUB
 
 #define IMPL_VISIT_FUNCS_SUB(Type, Super) \
@@ -29,5 +30,6 @@ IMPL_VISIT_FUNCS_SUB(Geometry, Clipper)
 IMPL_VISIT_FUNCS_SUB(Plane, Geometry)
 IMPL_VISIT_FUNCS_SUB(Box, Geometry)
 IMPL_VISIT_FUNCS_SUB(Sphere, Geometry)
+IMPL_VISIT_FUNCS_SUB(Cone, Geometry)
 #undef IMPL_VISIT_FUNCS_SUB
 
