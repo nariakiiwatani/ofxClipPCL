@@ -61,6 +61,7 @@ public:
 		return clipper;
 	}
 	void add(std::shared_ptr<Clipper> clipper) { clippers_.push_back(clipper); }
+	void remove(std::shared_ptr<Clipper> clipper) { clippers_.erase(find(std::begin(clippers_), std::end(clippers_), clipper)); }
 	void clear() { clippers_.clear(); }
 	std::vector<std::shared_ptr<Clipper>> getClippers() const { return clippers_; }
 protected:
