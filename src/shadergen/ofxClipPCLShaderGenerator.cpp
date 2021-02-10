@@ -16,10 +16,10 @@ void Generator::attachToShader(ofShader &dst, const std::string &clipping_func_n
 	glDeleteShader(shader);
 }
 
-std::string Generator::createFuncs() const
+std::string Generator::createDeclarations() const
 {
 	std::string ret;
-	auto funcs = createFunc(clipper_);
+	auto funcs = createDeclaration(clipper_);
 	for(auto &&func : funcs) {
 		ret += func.second + "\n";
 	}
@@ -29,29 +29,34 @@ std::string Generator::createFuncs() const
 std::string Generator::createMain(const std::string &func_name) const
 {
 	return R"(#version 410
-	)" + createFuncs() + R"(
-	
-	bool )" + func_name + R"((vec3 position) {
-	return )" + clipper_.getShaderCodeFuncCall("position") + R"(;
-	})";
+	)" + createDeclarations() + R"(
+	)" + createCall(func_name) + R"(
+	)";
 }
 
-
-std::map<std::string, std::string> Generator::createFunc(const ::ofx::clippcl::Clipper &src, bool check_if_group) const
+std::map<std::string, std::string> Generator::createDeclaration(const ::ofx::clippcl::Clipper &src, bool check_if_group) const
 {
 	if(check_if_group) {
 		if(auto group = dynamic_cast<const ::ofx::clippcl::ClipperGroup*>(&src)) {
-			return createFunc(*group);
+			return createDeclaration(*group);
 		}
 	}
 	return {{src.getShaderCodeFuncName(), src.getShaderCodeFunc("vec3", "position")}};
 }
-std::map<std::string, std::string> Generator::createFunc(const ::ofx::clippcl::ClipperGroup &src) const
+std::map<std::string, std::string> Generator::createDeclaration(const ::ofx::clippcl::ClipperGroup &src) const
 {
-	std::map<std::string, std::string> ret = createFunc(src, false);
+	std::map<std::string, std::string> ret = createDeclaration(src, false);
 	for(auto &&clipper : src.getClippers()) {
-		auto funcs = createFunc(*clipper);
+		auto funcs = createDeclaration(*clipper);
 		ret.insert(begin(funcs), end(funcs));
 	}
 	return ret;
+}
+
+std::string Generator::createCall(const std::string &func_name) const
+{
+	return R"(
+	bool )" + func_name + R"((vec3 position) {
+	return )" + clipper_.getShaderCodeFuncCall("position") + R"(;
+	})";
 }
