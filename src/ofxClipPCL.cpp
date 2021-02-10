@@ -39,43 +39,30 @@ std::string Clipper::getShaderCodeFuncCall(const std::string &default_src_arg) c
 
 std::vector<std::string> ClipperGroup::getArgsForShaderFuncDeclare(const std::string &src_arg) const
 {
-	if(clippers_.empty()) {
-		return {};
-	}
-	return {"bool["+ofToString(clippers_.size())+"] results"};
+	return {"bool result"};
 }
-std::vector<std::string> ClipperGroup::getArgsForShaderFunc(const std::string &src_arg) const
+std::string ClipperGroup::getShaderCodeFuncName() const
+{
+	return "ofxClipPCLFuncGroup";
+}
+std::string ClipperGroup::getShaderCodeFuncImpl(const std::string &default_src_arg) const
+{
+	return "return result;";
+}
+
+std::vector<std::string> ClipperGroupAll::getArgsForShaderFunc(const std::string &src_arg) const
 {
 	if(clippers_.empty()) {
-		return {};
+		return {"(true)"};
 	}
 	std::vector<std::string> funcs;
 	funcs.reserve(clippers_.size());
 	for(auto &&clipper : clippers_) {
 		funcs.push_back(clipper->getShaderCodeFuncCall(src_arg));
 	}
-	return {"bool["+ofToString(clippers_.size())+"]("
-		+ ofJoinString(funcs, ",") + 
-		")"
-	};
+	return {"("+ofJoinString(funcs, "\n&& ")+")"};
 }
 
-std::string ClipperGroupAll::getShaderCodeFuncName() const
-{
-	return "ofxClipPCLFuncGroupAll"+ofToString(clippers_.size());
-}
-std::string ClipperGroupAll::getShaderCodeFuncImpl(const std::string &default_src_arg) const
-{
-	if(clippers_.empty()) {
-		return "return true;";
-	}
-	return R"(
-	for(int ptr = 0; ptr < )" + ofToString(clippers_.size()) + R"(; ++ptr) {
-		if(!results[ptr]) return false;
-	}
-	return true;
-	)";
-}
 bool ClipperGroupAll::isValid(const glm::vec3 &point) const
 {
 	return all_of(begin(clippers_), end(clippers_), [point](shared_ptr<Clipper> clipper) {
@@ -83,22 +70,19 @@ bool ClipperGroupAll::isValid(const glm::vec3 &point) const
 	});
 }
 
-std::string ClipperGroupAny::getShaderCodeFuncName() const
-{
-	return "ofxClipPCLFuncGroupAny"+ofToString(clippers_.size());
-}
-std::string ClipperGroupAny::getShaderCodeFuncImpl(const std::string &default_src_arg) const
+std::vector<std::string> ClipperGroupAny::getArgsForShaderFunc(const std::string &src_arg) const
 {
 	if(clippers_.empty()) {
-		return "return false;";
+		return {"(false)"};
 	}
-	return R"(
-	for(int ptr = 0; ptr < )" + ofToString(clippers_.size()) + R"(; ++ptr) {
-		if(results[ptr]) return true;
+	std::vector<std::string> funcs;
+	funcs.reserve(clippers_.size());
+	for(auto &&clipper : clippers_) {
+		funcs.push_back(clipper->getShaderCodeFuncCall(src_arg));
 	}
-	return false;
-	)";
+	return {"("+ofJoinString(funcs, "\n|| ")+")"};
 }
+
 bool ClipperGroupAny::isValid(const glm::vec3 &point) const
 {
 	return any_of(begin(clippers_), end(clippers_), [point](shared_ptr<Clipper> clipper) {
