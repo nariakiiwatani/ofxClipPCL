@@ -22,6 +22,7 @@ class ClipperGroup;
 class ClipperGroupAll;
 class ClipperGroupAny;
 class Geometry;
+class GeometryByMatrix;
 class Plane;
 class Box;
 class Sphere;
@@ -34,6 +35,7 @@ public:
 	virtual void visit(ClipperGroupAll&);
 	virtual void visit(ClipperGroupAny&);
 	virtual void visit(Geometry&);
+	virtual void visit(GeometryByMatrix&);
 	virtual void visit(Plane&);
 	virtual void visit(Box&);
 	virtual void visit(Sphere&);
@@ -47,6 +49,7 @@ public:
 	virtual void visit(const ClipperGroupAll&);
 	virtual void visit(const ClipperGroupAny&);
 	virtual void visit(const Geometry&);
+	virtual void visit(const GeometryByMatrix&);
 	virtual void visit(const Plane&);
 	virtual void visit(const Box&);
 	virtual void visit(const Sphere&);

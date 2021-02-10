@@ -9,131 +9,107 @@ class Geometry : public Clipper
 public:
 	OFX_CLIPPCL_ACCEPTOR_FUNCTIONS_OVERRIDE
 	
-	virtual void setMatrix(const glm::mat4 &mat) {}
-	virtual glm::mat4 getMatrix() const = 0;
 	virtual void draw() const {}
 };
 
-class Plane : public Geometry
+class GeometryByMatrix : public Geometry
 {
 public:
 	OFX_CLIPPCL_ACCEPTOR_FUNCTIONS_OVERRIDE
 	
-	Plane()=default;
-	Plane(const glm::vec4 &args) {
-		setMatrix(buildMatrix(args));
+	GeometryByMatrix()=default;
+	GeometryByMatrix(const glm::mat4 &mat) {
+		setMatrix(mat);
+	}
+	GeometryByMatrix(const glm::vec3 &translate, const glm::quat &rotate, const glm::vec3 &scale)
+	:GeometryByMatrix(glm::translate(translate)
+			  *glm::mat4_cast(rotate)
+			  *glm::scale(scale)) {
+	}
+	
+	virtual void draw() const override;
+	virtual bool isValid(const glm::vec3 &point) const override;
+	
+	glm::mat4 getMatrix() const { return mat_; }
+	virtual void setMatrix(const glm::mat4 &mat);
+	
+	virtual std::vector<std::string> getArgsForShaderFuncDeclare(const std::string &src_arg) const override;
+	virtual std::vector<std::string> getArgsForShaderFunc(const std::string &src_arg) const override;
+	virtual std::string getShaderCodeFuncImpl(const std::string &default_src_arg) const override;
+protected:
+	virtual bool isValidLocal(const glm::vec3 &local_pos) const { return true; }
+	virtual std::string getShaderCodeFuncImplLocal(const std::string &default_src_arg) const { return "return true;"; }
+	virtual void drawLocal() const {}
+	glm::mat4 mat_, inv_mat_;
+};
+class Plane : public GeometryByMatrix
+{
+public:
+	OFX_CLIPPCL_ACCEPTOR_FUNCTIONS_OVERRIDE
+	
+	using GeometryByMatrix::GeometryByMatrix;
+	Plane(const glm::vec4 &args)
+	:GeometryByMatrix(buildMatrix(args)) {
 	}
 	Plane(const glm::vec3 &normal, float distance)
 	:Plane(glm::vec4(normal, distance)) {
 	}
 
-	glm::mat4 getMatrix() const override;
-	void setMatrix(const glm::mat4 &mat) override;
-	void draw() const override;
-	bool isValid(const glm::vec3 &point) const override;
-
-	std::string getShaderCodeFuncName() const override;
-	std::vector<std::string> getArgsForShaderFuncDeclare(const std::string &src_arg) const override;
-	std::string getShaderCodeFuncImpl(const std::string &default_src_arg) const override;
-	std::vector<std::string> getArgsForShaderFunc(const std::string &src_arg) const override;
+	std::string getShaderCodeFuncName() const override { return "ofxClipPCLFuncPlane"; }
 private:
-	glm::mat4 mat_;
-	glm::vec3 normal_ = glm::vec3(0,0,1);
-	float distance_ = 0;
-	glm::vec3 scale_ = glm::vec3(1);
 	glm::mat4 buildMatrix(const glm::vec4 &args, const glm::vec3 &scale=glm::vec3(1)) const;
+	void drawLocal() const override;
+	bool isValidLocal(const glm::vec3 &point) const override;
+	std::string getShaderCodeFuncImplLocal(const std::string &default_src_arg) const override;
 };
 
-class Box : public Geometry
+class Box : public GeometryByMatrix
 {
 public:
 	OFX_CLIPPCL_ACCEPTOR_FUNCTIONS_OVERRIDE
 
-	Box()=default;
-	Box(const glm::mat4 &mat) {
-		setMatrix(mat);
-	}
-	Box(const glm::vec3 &translate, const glm::quat &rotate, const glm::vec3 &scale)
-	:Box(glm::translate(translate)
-			  *glm::mat4_cast(rotate)
-			  *glm::scale(scale)) {
-	}
-
+	using GeometryByMatrix::GeometryByMatrix;
 	Box(const glm::vec3 &center, float width, float height, float depth)
-	:Box(center, glm::quat(), glm::vec3(width, height, depth)) {
+	:GeometryByMatrix(center, glm::quat(), glm::vec3(width, height, depth)) {
 	}
 
-	glm::mat4 getMatrix() const override;
-	void setMatrix(const glm::mat4 &mat) override;
-	void draw() const override;
-	bool isValid(const glm::vec3 &point) const override;
-	
-	std::string getShaderCodeFuncName() const override;
-	std::vector<std::string> getArgsForShaderFuncDeclare(const std::string &src_arg) const override;
-	std::string getShaderCodeFuncImpl(const std::string &default_src_arg) const override;
-	std::vector<std::string> getArgsForShaderFunc(const std::string &src_arg) const override;
+	std::string getShaderCodeFuncName() const override { return "ofxClipPCLFuncBox"; }
 private:
-	glm::mat4 mat_, inv_mat_;
+	void drawLocal() const override;
+	bool isValidLocal(const glm::vec3 &point) const override;
+	std::string getShaderCodeFuncImplLocal(const std::string &default_src_arg) const override;
 };
 
-class Sphere : public Geometry
+class Sphere : public GeometryByMatrix
 {
 public:
 	OFX_CLIPPCL_ACCEPTOR_FUNCTIONS_OVERRIDE
 	
-	Sphere()=default;
-	Sphere(const glm::mat4 &mat) {
-		setMatrix(mat);
-	}
-	Sphere(const glm::vec3 &translate, const glm::quat &rotate, const glm::vec3 &scale)
-	:Sphere(glm::translate(translate)
-			  *glm::mat4_cast(rotate)
-			  *glm::scale(scale)) {
-	}
+	using GeometryByMatrix::GeometryByMatrix;
 	Sphere(const glm::vec3 &center, float radius)
-	:Sphere(center, glm::quat(), glm::vec3(radius))
+	:GeometryByMatrix(center, glm::quat(), glm::vec3(radius))
 	{}
 	
-	glm::mat4 getMatrix() const override;
-	void setMatrix(const glm::mat4 &mat) override;
-	void draw() const override;
-	bool isValid(const glm::vec3 &point) const override;
-	
-	std::string getShaderCodeFuncName() const override;
-	std::vector<std::string> getArgsForShaderFuncDeclare(const std::string &src_arg) const override;
-	std::string getShaderCodeFuncImpl(const std::string &default_src_arg) const override;
-	std::vector<std::string> getArgsForShaderFunc(const std::string &src_arg) const override;
+	std::string getShaderCodeFuncName() const override { return "ofxClipPCLFuncSphere"; }
 private:
-	glm::mat4 mat_, inv_mat_;
+	void drawLocal() const override;
+	bool isValidLocal(const glm::vec3 &point) const override;
+	std::string getShaderCodeFuncImplLocal(const std::string &default_src_arg) const override;
 };
-class Cone : public Geometry
+class Cone : public GeometryByMatrix
 {
 public:
 	OFX_CLIPPCL_ACCEPTOR_FUNCTIONS_OVERRIDE
 	
-	Cone()=default;
-	Cone(const glm::mat4 &mat) {
-		setMatrix(mat);
-	}
-	Cone(const glm::vec3 &center_of_footprint, const glm::quat &rotate, const glm::vec3 &scale)
-	:Cone(glm::translate(center_of_footprint)
-			*glm::mat4_cast(rotate)
-			*glm::scale(scale)) {
-	}
+	using GeometryByMatrix::GeometryByMatrix;
 	Cone(const glm::vec3 &center_of_footprint, float radius, float height)
-	:Cone(center_of_footprint, glm::quat(), glm::vec3(radius,height,radius))
+	:GeometryByMatrix(center_of_footprint, glm::quat(), glm::vec3(radius,height,radius))
 	{}
 	
-	glm::mat4 getMatrix() const override;
-	void setMatrix(const glm::mat4 &mat) override;
-	void draw() const override;
-	bool isValid(const glm::vec3 &point) const override;
-	
-	std::string getShaderCodeFuncName() const override;
-	std::vector<std::string> getArgsForShaderFuncDeclare(const std::string &src_arg) const override;
-	std::string getShaderCodeFuncImpl(const std::string &default_src_arg) const override;
-	std::vector<std::string> getArgsForShaderFunc(const std::string &src_arg) const override;
+	std::string getShaderCodeFuncName() const override { return "ofxClipPCLFuncCone"; }
 private:
-	glm::mat4 mat_, inv_mat_;
+	void drawLocal() const override;
+	bool isValidLocal(const glm::vec3 &point) const override;
+	std::string getShaderCodeFuncImplLocal(const std::string &default_src_arg) const override;
 };
 }}

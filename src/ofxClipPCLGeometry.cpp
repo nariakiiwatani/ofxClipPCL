@@ -8,6 +8,48 @@
 using namespace ofx::clippcl;
 using namespace std;
 
+void GeometryByMatrix::setMatrix(const glm::mat4 &mat)
+{
+	mat_ = mat;
+	inv_mat_ = glm::inverse(mat);
+}
+
+void GeometryByMatrix::draw() const
+{
+	ofPushMatrix();
+	ofMultMatrix(mat_);
+	drawLocal();
+	ofPopMatrix();
+}
+
+bool GeometryByMatrix::isValid(const glm::vec3 &point) const
+{
+	return isValidLocal(inv_mat_*glm::vec4(point, 1));
+}
+
+std::vector<std::string> GeometryByMatrix::getArgsForShaderFuncDeclare(const std::string &src_arg) const
+{
+	return {src_arg, "mat4 inv_mat"};
+}
+std::vector<std::string> GeometryByMatrix::getArgsForShaderFunc(const std::string &src_arg) const
+{
+	return {src_arg, "mat4("+
+		ofJoinString({
+			glm::to_string(inv_mat_[0]),
+			glm::to_string(inv_mat_[1]),
+			glm::to_string(inv_mat_[2]),
+			glm::to_string(inv_mat_[3])}, ",")+")"};
+}
+
+std::string GeometryByMatrix::getShaderCodeFuncImpl(const std::string &default_src_arg) const
+{
+	auto local_pos_name = default_src_arg+"_local";
+	return R"(
+	vec3 )" + local_pos_name + R"( = (inv_mat*vec4()" + default_src_arg + R"(,1)).xyz;
+	)" + getShaderCodeFuncImplLocal(local_pos_name);	
+}
+
+
 glm::mat4 Plane::buildMatrix(const glm::vec4 &args, const glm::vec3 &scale) const
 {
 	ofNode node;
@@ -17,195 +59,70 @@ glm::mat4 Plane::buildMatrix(const glm::vec4 &args, const glm::vec3 &scale) cons
 	return node.getLocalTransformMatrix();
 }
 
-void Plane::setMatrix(const glm::mat4 &mat)
+std::string Plane::getShaderCodeFuncImplLocal(const std::string &default_src_arg) const
 {
-	mat_ = mat;
-	glm::vec4 args = glm::inverse(glm::transpose(mat))*glm::vec4{0,0,1,0};
-	normal_ = args;
-	distance_ = args[3];
-	scale_ = glm::vec3(glm::length(glm::vec3(mat[0])),
-					   glm::length(glm::vec3(mat[1])),
-					   glm::length(glm::vec3(mat[2])));
+	return "return " + default_src_arg + ".z > 0;";
 }
 
-glm::mat4 Plane::getMatrix() const
+bool Plane::isValidLocal(const glm::vec3 &point) const
 {
-	return mat_;
+	return point.z > 0;
 }
 
-std::string Plane::getShaderCodeFuncName() const
+void Plane::drawLocal() const
 {
-	return "ofxClipPCLFuncPlane";
-}
-std::vector<std::string> Plane::getArgsForShaderFuncDeclare(const std::string &src_arg) const
-{
-	return {src_arg, "vec3 normal", "float distance"};
-}
-std::string Plane::getShaderCodeFuncImpl(const std::string &default_src_arg) const
-{
-	return "return dot(" + default_src_arg + ", normal) > distance;";
-}
-std::vector<std::string> Plane::getArgsForShaderFunc(const std::string &src_arg) const
-{
-	return {src_arg, glm::to_string(normal_), ofToString(-distance_)};
-}
-bool Plane::isValid(const glm::vec3 &point) const {
-	return glm::dot(point, normal_) > -distance_;
-}
-void Plane::draw() const
-{
-	ofPushMatrix();
-	ofMultMatrix(mat_);
 	ofDrawPlane(0,0,0,1,1);
-	ofPopMatrix();
 }
 
 
-glm::mat4 Box::getMatrix() const
+void Box::drawLocal() const
 {
-	return mat_;
-}
-void Box::setMatrix(const glm::mat4 &mat)
-{
-	mat_ = mat;
-	inv_mat_ = glm::inverse(mat);
-}
-
-void Box::draw() const
-{
-	ofPushMatrix();
-	ofMultMatrix(mat_);
 	ofDrawBox(2);
-	ofPopMatrix();
 }
-bool Box::isValid(const glm::vec3 &point) const
+bool Box::isValidLocal(const glm::vec3 &point) const
 {
-	auto p = glm::abs(inv_mat_*glm::vec4(point, 1));
+	auto p = glm::abs(point);
 	return std::max(p.x, std::max(p.y, p.z)) < 1;
 }
 
-std::string Box::getShaderCodeFuncName() const
-{
-	return "ofxClipPCLFuncBox";
-}
-std::vector<std::string> Box::getArgsForShaderFuncDeclare(const std::string &src_arg) const
-{
-	return {src_arg, "mat4 inv_mat"};
-}
-std::string Box::getShaderCodeFuncImpl(const std::string &default_src_arg) const
+std::string Box::getShaderCodeFuncImplLocal(const std::string &default_src_arg) const
 {
 	return R"(
-	vec4 p = abs(inv_mat*vec4()" + default_src_arg + R"(,1));
+	vec3 p = abs()" + default_src_arg + R"();
 	return max(p.x, max(p.y, p.z)) < 1;
 	)";
 }
-std::vector<std::string> Box::getArgsForShaderFunc(const std::string &src_arg) const
-{
-	
-	return {src_arg, "mat4("+
-		ofJoinString({
-			glm::to_string(inv_mat_[0]),
-			glm::to_string(inv_mat_[1]),
-			glm::to_string(inv_mat_[2]),
-			glm::to_string(inv_mat_[3])}, ",")+")"};
-}
 
 
-glm::mat4 Sphere::getMatrix() const
+void Sphere::drawLocal() const
 {
-	return mat_;
-}
-void Sphere::setMatrix(const glm::mat4 &mat)
-{
-	mat_ = mat;
-	inv_mat_ = glm::inverse(mat);
-}
-
-void Sphere::draw() const
-{
-	ofPushMatrix();
-	ofMultMatrix(mat_);
 	ofDrawSphere(1);
-	ofPopMatrix();
 }
-bool Sphere::isValid(const glm::vec3 &point) const
+bool Sphere::isValidLocal(const glm::vec3 &point) const
 {
-	return glm::length2(glm::vec3(inv_mat_*glm::vec4(point, 1))) < 1;
-}
-
-std::string Sphere::getShaderCodeFuncName() const
-{
-	return "ofxClipPCLFuncSphere";
-}
-std::vector<std::string> Sphere::getArgsForShaderFuncDeclare(const std::string &src_arg) const
-{
-	return {src_arg, "mat4 inv_mat"};
-}
-std::string Sphere::getShaderCodeFuncImpl(const std::string &default_src_arg) const
-{
-	return R"(
-	vec3 p = (inv_mat*vec4()" + default_src_arg + R"(,1)).xyz;
-	return dot(p,p) < 1;
-	)";
-}
-std::vector<std::string> Sphere::getArgsForShaderFunc(const std::string &src_arg) const
-{
-	
-	return {src_arg, "mat4("+
-		ofJoinString({
-			glm::to_string(inv_mat_[0]),
-			glm::to_string(inv_mat_[1]),
-			glm::to_string(inv_mat_[2]),
-			glm::to_string(inv_mat_[3])}, ",")+")"};
+	return glm::length2(point) < 1;
 }
 
-glm::mat4 Cone::getMatrix() const
+std::string Sphere::getShaderCodeFuncImplLocal(const std::string &default_src_arg) const
 {
-	return mat_;
-}
-void Cone::setMatrix(const glm::mat4 &mat)
-{
-	mat_ = mat;
-	inv_mat_ = glm::inverse(mat);
+	return "return dot("+default_src_arg+","+default_src_arg+") < 1;";
 }
 
-void Cone::draw() const
+void Cone::drawLocal() const
 {
-	ofPushMatrix();
-	ofMultMatrix(mat_);
 	ofDrawCone(0,0.5f,0, 1,-1);
-	ofPopMatrix();
 }
-bool Cone::isValid(const glm::vec3 &point) const
+bool Cone::isValidLocal(const glm::vec3 &point) const
 {
-	auto pos = glm::vec3(inv_mat_*glm::vec4(point, 1));
-	auto xz = glm::vec2(pos.x,pos.z);
-	auto y = pos.y;
+	auto xz = glm::vec2(point.x,point.z);
+	auto y = point.y;
 	return y > 0 && y < 1 && glm::length2(xz) < (1-y)*(1-y);
 }
 
-std::string Cone::getShaderCodeFuncName() const
-{
-	return "ofxClipPCLFuncCone";
-}
-std::vector<std::string> Cone::getArgsForShaderFuncDeclare(const std::string &src_arg) const
-{
-	return {src_arg, "mat4 inv_mat"};
-}
-std::string Cone::getShaderCodeFuncImpl(const std::string &default_src_arg) const
+std::string Cone::getShaderCodeFuncImplLocal(const std::string &default_src_arg) const
 {
 	return R"(
-	vec3 p = (inv_mat*vec4()" + default_src_arg + R"(,1)).xyz;
+	vec3 p = )" + default_src_arg + R"(;
 	return p.y > 0 && p.y < 1 && dot(p.xz,p.xz) < (1-p.y)*(1-p.y);
 	)";
-}
-std::vector<std::string> Cone::getArgsForShaderFunc(const std::string &src_arg) const
-{
-	
-	return {src_arg, "mat4("+
-		ofJoinString({
-			glm::to_string(inv_mat_[0]),
-			glm::to_string(inv_mat_[1]),
-			glm::to_string(inv_mat_[2]),
-			glm::to_string(inv_mat_[3])}, ",")+")"};
 }
