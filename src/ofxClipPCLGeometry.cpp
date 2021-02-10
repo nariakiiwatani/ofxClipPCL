@@ -108,6 +108,23 @@ std::string Sphere::getShaderCodeFuncImplLocal(const std::string &default_src_ar
 	return "return dot("+default_src_arg+","+default_src_arg+") < 1;";
 }
 
+void Cylinder::drawLocal() const
+{
+	ofDrawCylinder(1,2);
+}
+bool Cylinder::isValidLocal(const glm::vec3 &point) const
+{
+	return glm::length2(glm::vec2(point.x,point.z)) < 1 && glm::abs(point.y) < 1;
+}
+
+std::string Cylinder::getShaderCodeFuncImplLocal(const std::string &default_src_arg) const
+{
+	return R"(
+	vec3 p = )" + default_src_arg + R"(;
+	return p.y*p.y < 1 && dot(p.xz,p.xz) < 1;
+	)";
+}
+
 void Cone::drawLocal() const
 {
 	ofDrawCone(0,0.5f,0, 1,-1);

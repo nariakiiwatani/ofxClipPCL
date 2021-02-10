@@ -96,6 +96,22 @@ private:
 	bool isValidLocal(const glm::vec3 &point) const override;
 	std::string getShaderCodeFuncImplLocal(const std::string &default_src_arg) const override;
 };
+class Cylinder : public GeometryByMatrix
+{
+public:
+	OFX_CLIPPCL_ACCEPTOR_FUNCTIONS_OVERRIDE
+	
+	using GeometryByMatrix::GeometryByMatrix;
+	Cylinder(const glm::vec3 &center, float radius, float height)
+	:GeometryByMatrix(center, glm::quat(), glm::vec3(radius,height,radius))
+	{}
+	
+	std::string getShaderCodeFuncName() const override { return "ofxClipPCLFuncCylinder"; }
+private:
+	void drawLocal() const override;
+	bool isValidLocal(const glm::vec3 &point) const override;
+	std::string getShaderCodeFuncImplLocal(const std::string &default_src_arg) const override;
+};
 class Cone : public GeometryByMatrix
 {
 public:

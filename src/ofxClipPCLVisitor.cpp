@@ -19,6 +19,7 @@ IMPL_VISIT_FUNCS_SUB(GeometryByMatrix, Geometry)
 IMPL_VISIT_FUNCS_SUB(Plane, GeometryByMatrix)
 IMPL_VISIT_FUNCS_SUB(Box, GeometryByMatrix)
 IMPL_VISIT_FUNCS_SUB(Sphere, GeometryByMatrix)
+IMPL_VISIT_FUNCS_SUB(Cylinder, GeometryByMatrix)
 IMPL_VISIT_FUNCS_SUB(Cone, GeometryByMatrix)
 #undef IMPL_VISIT_FUNCS_SUB
 
@@ -32,6 +33,7 @@ IMPL_VISIT_FUNCS_SUB(GeometryByMatrix, Geometry)
 IMPL_VISIT_FUNCS_SUB(Plane, GeometryByMatrix)
 IMPL_VISIT_FUNCS_SUB(Box, GeometryByMatrix)
 IMPL_VISIT_FUNCS_SUB(Sphere, GeometryByMatrix)
+IMPL_VISIT_FUNCS_SUB(Cylinder, GeometryByMatrix)
 IMPL_VISIT_FUNCS_SUB(Cone, GeometryByMatrix)
 #undef IMPL_VISIT_FUNCS_SUB
 

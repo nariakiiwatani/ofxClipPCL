@@ -26,6 +26,7 @@ class GeometryByMatrix;
 class Plane;
 class Box;
 class Sphere;
+class Cylinder;
 class Cone;
 class Visitor
 {
@@ -39,6 +40,7 @@ public:
 	virtual void visit(Plane&);
 	virtual void visit(Box&);
 	virtual void visit(Sphere&);
+	virtual void visit(Cylinder&);
 	virtual void visit(Cone&);
 };
 class ConstVisitor
@@ -53,6 +55,7 @@ public:
 	virtual void visit(const Plane&);
 	virtual void visit(const Box&);
 	virtual void visit(const Sphere&);
+	virtual void visit(const Cylinder&);
 	virtual void visit(const Cone&);
 };
 
