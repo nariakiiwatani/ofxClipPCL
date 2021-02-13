@@ -28,9 +28,9 @@ void ofApp::draw(){
 	camera_.end();
 	gui_.begin();
 	ImGuizmo::BeginFrame();
-	auto mat = geom_->getWorldMatrix();
+	auto mat = geom_->getMatrix();
 	if(ImGuizmo::Manipulate(camera_, mat, op_, mode_)) {
-		geom_->setWorldMatrix(mat);
+		geom_->setMatrix(mat);
 	}
 	gui_.end();
 }

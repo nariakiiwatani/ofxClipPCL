@@ -24,7 +24,7 @@ public:
 	void dragEvent(ofDragInfo dragInfo);
 	void gotMessage(ofMessage msg);
 private:
-	std::shared_ptr<ofx::clippcl::Geometry> geom_;
+	std::shared_ptr<ofx::clippcl::GeometryByMatrix> geom_;
 	ofxImGui::Gui gui_;
 	ImGuizmo::OPERATION op_;
 	ImGuizmo::MODE mode_;
