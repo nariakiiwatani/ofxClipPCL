@@ -48,6 +48,7 @@ public:
 	OFX_CLIPPCL_ACCEPTOR_FUNCTIONS_OVERRIDE
 	
 	using GeometryByMatrix::GeometryByMatrix;
+	Plane():GeometryByMatrix(){}
 	Plane(const glm::vec4 &args)
 	:GeometryByMatrix(buildMatrix(args)) {
 	}
@@ -69,6 +70,7 @@ public:
 	OFX_CLIPPCL_ACCEPTOR_FUNCTIONS_OVERRIDE
 
 	using GeometryByMatrix::GeometryByMatrix;
+	Box():GeometryByMatrix(){}
 	Box(const glm::vec3 &center, float width, float height, float depth)
 	:GeometryByMatrix(center, glm::quat(), glm::vec3(width, height, depth)) {
 	}
@@ -86,6 +88,7 @@ public:
 	OFX_CLIPPCL_ACCEPTOR_FUNCTIONS_OVERRIDE
 	
 	using GeometryByMatrix::GeometryByMatrix;
+	Sphere():GeometryByMatrix(){}
 	Sphere(const glm::vec3 &center, float radius)
 	:GeometryByMatrix(center, glm::quat(), glm::vec3(radius))
 	{}
@@ -102,6 +105,7 @@ public:
 	OFX_CLIPPCL_ACCEPTOR_FUNCTIONS_OVERRIDE
 	
 	using GeometryByMatrix::GeometryByMatrix;
+	Cylinder():GeometryByMatrix(){}
 	Cylinder(const glm::vec3 &center, float radius, float height)
 	:GeometryByMatrix(center, glm::quat(), glm::vec3(radius,height,radius))
 	{}
@@ -118,6 +122,7 @@ public:
 	OFX_CLIPPCL_ACCEPTOR_FUNCTIONS_OVERRIDE
 	
 	using GeometryByMatrix::GeometryByMatrix;
+	Cone():GeometryByMatrix(){}
 	Cone(const glm::vec3 &center_of_footprint, float radius, float height)
 	:GeometryByMatrix(center_of_footprint, glm::quat(), glm::vec3(radius,height,radius))
 	{}
