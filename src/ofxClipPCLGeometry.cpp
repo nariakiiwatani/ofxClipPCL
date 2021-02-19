@@ -44,8 +44,8 @@ std::vector<std::string> GeometryByMatrix::getArgsForShaderFunc(const std::strin
 std::string GeometryByMatrix::getShaderCodeFuncImpl(const std::string &default_src_arg) const
 {
 	auto local_pos_name = default_src_arg+"_local";
-	return R"(
-	vec3 )" + local_pos_name + R"( = (inv_mat*vec4()" + default_src_arg + R"(,1)).xyz;
+	return
+	R"(vec3 )" + local_pos_name + R"( = (inv_mat*vec4()" + default_src_arg + R"(,1)).xyz;
 	)" + getShaderCodeFuncImplLocal(local_pos_name);	
 }
 
@@ -87,10 +87,9 @@ bool Box::isValidLocal(const glm::vec3 &point) const
 
 std::string Box::getShaderCodeFuncImplLocal(const std::string &default_src_arg) const
 {
-	return R"(
-	vec3 p = abs()" + default_src_arg + R"();
-	return max(p.x, max(p.y, p.z)) < 1;
-	)";
+	return
+	R"(vec3 p = abs()" + default_src_arg + R"();
+	return max(p.x, max(p.y, p.z)) < 1;)";
 }
 
 
@@ -119,10 +118,9 @@ bool Cylinder::isValidLocal(const glm::vec3 &point) const
 
 std::string Cylinder::getShaderCodeFuncImplLocal(const std::string &default_src_arg) const
 {
-	return R"(
-	vec3 p = )" + default_src_arg + R"(;
-	return p.y*p.y < 1 && dot(p.xz,p.xz) < 1;
-	)";
+	return
+	R"(vec3 p = )" + default_src_arg + R"(;
+	return p.y*p.y < 1 && dot(p.xz,p.xz) < 1;)";
 }
 
 void Cone::drawLocal() const
@@ -138,8 +136,7 @@ bool Cone::isValidLocal(const glm::vec3 &point) const
 
 std::string Cone::getShaderCodeFuncImplLocal(const std::string &default_src_arg) const
 {
-	return R"(
-	vec3 p = )" + default_src_arg + R"(;
-	return p.y > 0 && p.y < 1 && dot(p.xz,p.xz) < (1-p.y)*(1-p.y);
-	)";
+	return
+	R"(vec3 p = )" + default_src_arg + R"(;
+	return p.y > 0 && p.y < 1 && dot(p.xz,p.xz) < (1-p.y)*(1-p.y);)";
 }

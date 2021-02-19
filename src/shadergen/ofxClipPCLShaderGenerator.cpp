@@ -29,9 +29,10 @@ std::string Generator::createDeclarations() const
 std::string Generator::createMain(const std::string &func_name) const
 {
 	return R"(#version 410
-	)" + createDeclarations() + R"(
-	)" + createCall(func_name) + R"(
-	)";
+
+)" + createDeclarations() + R"(
+)" + createCall(func_name) + R"(
+)";
 }
 
 std::map<std::string, std::string> Generator::createDeclaration(const ::ofx::clippcl::Clipper &src, bool check_if_group) const
@@ -56,7 +57,8 @@ std::map<std::string, std::string> Generator::createDeclaration(const ::ofx::cli
 std::string Generator::createCall(const std::string &func_name) const
 {
 	return R"(
-	bool )" + func_name + R"((vec3 position) {
+bool )" + func_name + R"((vec3 position) {
 	return )" + clipper_.getShaderCodeFuncCall("position") + R"(;
-	})";
+}
+)";
 }

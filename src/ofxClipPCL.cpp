@@ -30,7 +30,9 @@ ofMesh Clipper::getValid(const ofMesh &src) const
 
 std::string Clipper::getShaderCodeFunc(const std::string &default_arg_type, const std::string &default_arg_name) const
 {
-	return "bool " + getShaderCodeFuncName() + "(" + ofJoinString(getArgsForShaderFuncDeclare(default_arg_type+" "+default_arg_name), ", ") + ") {" + getShaderCodeFuncImpl(default_arg_name) + "}";
+	return "bool " + getShaderCodeFuncName() + "(" + ofJoinString(getArgsForShaderFuncDeclare(default_arg_type+" "+default_arg_name), ", ") + R"() {
+	)" + getShaderCodeFuncImpl(default_arg_name) + R"(
+})";
 }
 std::string Clipper::getShaderCodeFuncCall(const std::string &default_src_arg) const
 {
@@ -53,14 +55,14 @@ std::string ClipperGroup::getShaderCodeFuncImpl(const std::string &default_src_a
 std::vector<std::string> ClipperGroupAll::getArgsForShaderFunc(const std::string &src_arg) const
 {
 	if(clippers_.empty()) {
-		return {"(true)"};
+		return {"true"};
 	}
 	std::vector<std::string> funcs;
 	funcs.reserve(clippers_.size());
 	for(auto &&clipper : clippers_) {
 		funcs.push_back(clipper->getShaderCodeFuncCall(src_arg));
 	}
-	return {"("+ofJoinString(funcs, "\n&& ")+")"};
+	return {ofJoinString(funcs, "\n	&& ")};
 }
 
 bool ClipperGroupAll::isValid(const glm::vec3 &point) const
@@ -73,14 +75,14 @@ bool ClipperGroupAll::isValid(const glm::vec3 &point) const
 std::vector<std::string> ClipperGroupAny::getArgsForShaderFunc(const std::string &src_arg) const
 {
 	if(clippers_.empty()) {
-		return {"(false)"};
+		return {"false"};
 	}
 	std::vector<std::string> funcs;
 	funcs.reserve(clippers_.size());
 	for(auto &&clipper : clippers_) {
 		funcs.push_back(clipper->getShaderCodeFuncCall(src_arg));
 	}
-	return {"("+ofJoinString(funcs, "\n|| ")+")"};
+	return {ofJoinString(funcs, "\n	|| ")};
 }
 
 bool ClipperGroupAny::isValid(const glm::vec3 &point) const
